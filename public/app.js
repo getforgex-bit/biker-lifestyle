@@ -1,5 +1,6 @@
 /* BIKER LIFESTYLE // comportamiento: Quick Dispatch Drawer, carrito, filtros, checkout WhatsApp */
-(() => {
+/* Los productos agregados desde Scan-bar llegan por scanbar.js y se insertan como tarjetas antes de leer el catalogo. */
+(window.ScanbarWeb ? window.ScanbarWeb.iniciar : (arrancar) => arrancar([]))((extras) => {
   "use strict";
 
   /* ===== Configuracion ===== */
@@ -17,6 +18,30 @@
   const fmt = (n) => n.toLocaleString("en-US");
   const pad2 = (n) => String(n).padStart(2, "0");
   const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  /* ===== Productos de Scan-bar: tarjetas con el mismo marcado que las del HTML =====
+     Categoria en Scan-bar: gorras, cascos o accesorios. En gorras, atributo "linea" (deportiva, casual, biker)
+     para los filtros. Las variantes son las tallas (S, M, L, XL): el SKU de cada talla es SKU-TALLA. */
+  const urlSegura = window.ScanbarWeb ? window.ScanbarWeb.urlSegura : () => "";
+  const grids = { gorras: "#gorras .product-grid", cascos: ".product-grid--helmets", accesorios: "#accesorios .product-grid" };
+  extras.forEach((x) => {
+    const grid = grids[x.category] && $(grids[x.category]);
+    if (!grid || $(`[data-add][data-sku="${CSS.escape(x.sku)}"]`)) { console.warn(`Scan-bar: ${x.sku} se omite (categoria: gorras, cascos o accesorios)`); return; }
+    const sized = x.variants.some((v) => v.label);
+    const price = Math.round(x.priceCents) / 100;
+    const name = esc(x.name), sku = esc(x.sku);
+    const line = ["deportiva", "casual", "biker"].includes(x.attrs && x.attrs.linea) ? ` data-line="${x.attrs.linea}"` : "";
+    // Sin foto propia se usa la de otra tarjeta de la misma seccion (mantiene la reticula y la CSP).
+    const img = urlSegura(x.imageUrl) || ($(".card-media img", grid) || { getAttribute: () => "" }).getAttribute("src");
+    const sizes = sized ? `<fieldset class="size"><legend class="label">Talla</legend><div class="size-opts">${x.variants.map((v) =>
+      `<label class="size-opt"><input type="radio" name="size-${sku}" value="${esc(v.label || "")}"${v.inStock ? "" : " disabled"}><span>${esc(v.label || "")}</span></label>`).join("")}</div><p class="size-error" hidden>Elige tu talla para agregar.</p></fieldset>` : "";
+    grid.insertAdjacentHTML("beforeend", `<article class="card"${line}>
+      <div class="card-bar"><span>${sku}</span><span>CHIAPAS MEX-190</span></div>
+      <div class="card-media">${img ? `<img src="${esc(img)}" alt="${name}" width="600" height="600" loading="lazy">` : ""}<span class="price-badge">$${fmt(price)} <small>MXN</small></span></div>
+      <div class="card-body"><h3 class="display">${name}</h3>${x.description ? `<p>${esc(x.description)}</p>` : ""}</div>
+      <div class="card-foot">${sizes}<button class="btn btn--red btn--block mech add-btn" type="button" data-add data-sku="${sku}" data-name="${name}" data-price="${price}"${sized ? ' data-sized="true"' : ""}>Agregar<span class="sr-only"> ${name} al carrito</span></button></div>
+    </article>`);
+  });
 
   /* ===== Catalogo (se lee del DOM: una sola fuente de verdad) ===== */
   const catalog = new Map();
@@ -362,4 +387,4 @@
 
   load();
   render();
-})();
+});

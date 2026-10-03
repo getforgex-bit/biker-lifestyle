@@ -60,3 +60,12 @@ La política `Content-Security-Policy` de `public/_headers` solo permite Google 
 - Autoalojar tipografías, iconos e imágenes (hoy vienen de Google Fonts, unpkg y googleusercontent) y entonces endurecer la CSP.
 - Confirmar con el cliente las tallas S a XL, el método de pago y los datos de accesorios que no vienen del brief (ver DESIGN.md, sección Pendientes).
 - Reemplazar el favicon (hoy usa el logo remoto) por un archivo propio y agregar etiquetas Open Graph cuando exista el dominio final.
+
+## Scan-bar (catálogo y códigos)
+
+Scan-bar es la base de datos de productos y códigos de barras de los negocios. Los productos de este HTML se registran solos en Scan-bar (`npm run sync:repos` allá): **cada talla de casco es un producto con su propio código** (`BKR-CS01-M`). Los productos que se agregan desde Scan-bar (*Administración → Productos y etiquetas*) aparecen como tarjetas con el mismo diseño, sin tocar este repositorio.
+
+- Activar: en `public/index.html`, `<script src="scanbar.js" data-url="https://URL-DE-SCAN-BAR" data-tienda="biker-lifestyle">`. Vacío = solo los productos del HTML.
+- **CSP**: agrega el origen de Scan-bar a `connect-src` y el host de las fotos a `img-src` en `public/_headers`; si no, el navegador bloquea la consulta y el sitio sigue solo con sus productos.
+- Probar en local: `http://localhost:8080/?scanbar=http://localhost:3000` (solo acepta localhost).
+- En Scan-bar: categoría `gorras` (atributo `linea`: `deportiva`, `casual` o `biker`), `cascos` (variantes = tallas `S, M, L, XL`) o `accesorios`. Sin foto se usa la de otra tarjeta de su sección. Contrato y diseño completo: `docs/INTEGRACION-WEBS.md` en el repositorio Scan-bar.

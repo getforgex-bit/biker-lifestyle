@@ -1,5 +1,7 @@
 # Cloudflare Pages / Workers Static Assets: cabeceras de seguridad y cache.
 # La CSP permite solo lo que el sitio carga hoy: Google Fonts, Phosphor (unpkg) e imagenes de googleusercontent.
+# Scan-bar: al publicar Scan-bar, agrega su origen (https://...) a connect-src y el host de las imagenes de los
+# productos que se agreguen desde ahi a img-src; si no, el sitio sigue funcionando solo con los productos del HTML.
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com https://unpkg.com; img-src 'self' data: https://lh3.googleusercontent.com; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'
   X-Content-Type-Options: nosniff
