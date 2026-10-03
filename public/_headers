@@ -1,0 +1,20 @@
+# Cloudflare Pages / Workers Static Assets: cabeceras de seguridad y cache.
+# La CSP permite solo lo que el sitio carga hoy: Google Fonts, Phosphor (unpkg) e imagenes de googleusercontent.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com https://unpkg.com; img-src 'self' data: https://lh3.googleusercontent.com; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/styles.css
+  Cache-Control: public, max-age=3600
+
+/app.js
+  Cache-Control: public, max-age=3600

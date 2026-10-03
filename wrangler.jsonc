@@ -1,0 +1,9 @@
+{
+  // Despliegue con Workers Static Assets: `npx wrangler deploy`.
+  // En Cloudflare Pages (conexion con GitHub) no se usa este archivo: ver README.
+  "name": "biker-lifestyle",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./public"
+  }
+}

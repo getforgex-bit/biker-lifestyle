@@ -1,0 +1,7 @@
+node_modules/
+.wrangler/
+.dev.vars
+.claude/
+.impeccable/critique/
+.DS_Store
+Thumbs.db
