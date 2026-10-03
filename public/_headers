@@ -1,9 +1,10 @@
 # Cloudflare Pages / Workers Static Assets: cabeceras de seguridad y cache.
-# La CSP permite solo lo que el sitio carga hoy: Google Fonts, Phosphor (unpkg) e imagenes de googleusercontent.
-# Scan-bar: al publicar Scan-bar, agrega su origen (https://...) a connect-src y el host de las imagenes de los
-# productos que se agreguen desde ahi a img-src; si no, el sitio sigue funcionando solo con los productos del HTML.
+# La CSP permite solo lo que el sitio carga: Google Fonts, Phosphor (unpkg), imagenes https (las de los productos
+# que se agregan desde Scan-bar pueden venir de cualquier host) y connect-src a *.workers.dev, donde vive Scan-bar
+# (scan-bar.<tu-cuenta>.workers.dev). Si Scan-bar vive en otro dominio, agregalo a connect-src.
+# Los scripts siguen siendo solo los del propio sitio ('self').
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com https://unpkg.com; img-src 'self' data: https://lh3.googleusercontent.com; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com https://unpkg.com; img-src 'self' data: https:; connect-src 'self' https://*.workers.dev; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
@@ -19,4 +20,7 @@
   Cache-Control: public, max-age=3600
 
 /app.js
+  Cache-Control: public, max-age=3600
+
+/scanbar.js
   Cache-Control: public, max-age=3600

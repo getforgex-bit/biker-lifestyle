@@ -38,21 +38,12 @@ o cualquier servidor estático sobre `public/` (por ejemplo `python -m http.serv
 
 ## Despliegue en Cloudflare
 
-**Opción A, Cloudflare Pages conectado a GitHub** (recomendada para este flujo):
+- **Desde GitHub** (cada push a `main` publica): Workers & Pages → Create → **Import a repository** → este repositorio. Build command: *(vacío)*; Deploy command: `npx wrangler deploy` (publica `public/`).
+- **Desde la terminal**: `npx wrangler login` (una vez) y `npx wrangler deploy`.
 
-1. Cloudflare Dashboard, Workers & Pages, Create, Pages, Connect to Git, elegir este repositorio.
-2. Framework preset: **None**. Build command: *(vacío)*. Build output directory: **`public`**.
-3. Cada push a `main` publica; cada rama genera una vista previa.
-4. Dominio propio: Custom domains en el proyecto de Pages.
+Queda en `https://biker-lifestyle.<tu-cuenta>.workers.dev`. Usa Workers y no Pages: en la misma cuenta que Scan-bar, la página lo encuentra sola y Scan-bar sabe a qué URL mandar sus códigos. Pasos de todo el sistema: `docs/DESPLIEGUE.md` en el repositorio Scan-bar.
 
-**Opción B, Workers Static Assets desde terminal:**
-
-```bash
-npx wrangler login
-npx wrangler deploy
-```
-
-La política `Content-Security-Policy` de `public/_headers` solo permite Google Fonts, Phosphor (unpkg) y las imágenes de `lh3.googleusercontent.com`. Si cambias de CDN o autoalojas fuentes e imágenes, actualízala.
+La política `Content-Security-Policy` de `public/_headers` solo permite scripts propios, Google Fonts, Phosphor (unpkg), imágenes https y consultas a `*.workers.dev` (Scan-bar). Si cambias de CDN o autoalojas fuentes e imágenes, actualízala.
 
 ## Pendientes antes de producción
 
@@ -63,9 +54,9 @@ La política `Content-Security-Policy` de `public/_headers` solo permite Google 
 
 ## Scan-bar (catálogo y códigos)
 
-Scan-bar es la base de datos de productos y códigos de barras de los negocios. Los productos de este HTML se registran solos en Scan-bar (`npm run sync:repos` allá): **cada talla de casco es un producto con su propio código** (`BKR-CS01-M`). Los productos que se agregan desde Scan-bar (*Administración → Productos y etiquetas*) aparecen como tarjetas con el mismo diseño, sin tocar este repositorio.
+Scan-bar es la base de datos de productos y códigos de barras de los negocios. Los productos de este HTML se registran solos en Scan-bar (Scan-bar revisa este repositorio cada 10 minutos; `npm run sync:repos` allá lo fuerza): **cada talla de casco es un producto con su propio código** (`BKR-CS01-M`). Los productos que se agregan desde Scan-bar (*Administración → Productos y etiquetas*) aparecen como tarjetas con el mismo diseño, sin tocar este repositorio.
 
-- Activar: en `public/index.html`, `<script src="scanbar.js" data-url="https://URL-DE-SCAN-BAR" data-tienda="biker-lifestyle">`. Vacío = solo los productos del HTML.
-- **CSP**: agrega el origen de Scan-bar a `connect-src` y el host de las fotos a `img-src` en `public/_headers`; si no, el navegador bloquea la consulta y el sitio sigue solo con sus productos.
+- Conexión: automática si la página vive en `biker-lifestyle.<tu-cuenta>.workers.dev` (usa `scan-bar.<tu-cuenta>.workers.dev`). En otro dominio: `data-url="https://URL-DE-SCAN-BAR"` en la etiqueta de `scanbar.js` de `public/index.html`; `data-url="off"` la apaga.
+- **CSP**: `public/_headers` ya permite `*.workers.dev` en `connect-src` e imágenes https; si Scan-bar vive en otro dominio, agrégalo a `connect-src` (si no, el navegador bloquea la consulta y el sitio sigue solo con sus productos).
 - Probar en local: `http://localhost:8080/?scanbar=http://localhost:3000` (solo acepta localhost).
 - En Scan-bar: categoría `gorras` (atributo `linea`: `deportiva`, `casual` o `biker`), `cascos` (variantes = tallas `S, M, L, XL`) o `accesorios`. Sin foto se usa la de otra tarjeta de su sección. Contrato y diseño completo: `docs/INTEGRACION-WEBS.md` en el repositorio Scan-bar.
